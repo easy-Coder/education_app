@@ -17,6 +17,9 @@ class $AssetsSvgGen {
   /// File path: assets/svg/a_plus.svg
   SvgGenImage get aPlus => const SvgGenImage('assets/svg/a_plus.svg');
 
+  /// File path: assets/svg/ai.svg
+  SvgGenImage get ai => const SvgGenImage('assets/svg/ai.svg');
+
   /// File path: assets/svg/instructor.svg
   SvgGenImage get instructor => const SvgGenImage('assets/svg/instructor.svg');
 
@@ -24,7 +27,7 @@ class $AssetsSvgGen {
   SvgGenImage get lady => const SvgGenImage('assets/svg/lady.svg');
 
   /// List of all assets
-  List<SvgGenImage> get values => [aPlus, instructor, lady];
+  List<SvgGenImage> get values => [aPlus, ai, instructor, lady];
 }
 
 class Assets {

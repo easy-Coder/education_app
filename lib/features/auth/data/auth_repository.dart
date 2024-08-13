@@ -13,7 +13,7 @@ class AuthRepository {
     return _auth.authStateChanges();
   }
 
-  User? currentUser() {
+  User? get currentUser {
     return _auth.currentUser;
   }
 
@@ -24,6 +24,10 @@ class AuthRepository {
 
   Future<UserCredential> logUserIn(String email, String password) {
     return _auth.signInWithEmailAndPassword(email: email, password: password);
+  }
+
+  Future<void> logout() async {
+    await _auth.signOut();
   }
 }
 

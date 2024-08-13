@@ -1,7 +1,10 @@
 import 'package:education_app/features/auth/presentation/signup/signup_controller.dart';
+import 'package:education_app/router/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:education_app/gen/assets.gen.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -16,6 +19,8 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
   String? email;
   String? password;
 
+  String? name;
+
   @override
   void initState() {
     super.initState();
@@ -23,7 +28,22 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loginController = ref.watch(signUpControllerProvider);
+    ref.listen<AsyncValue>(signUpControllerProvider, (_, state) {
+      if (!state.isLoading && state.hasError) {
+        debugPrint('State: $state');
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(
+            content: Text(state.error.toString()),
+          ));
+        return;
+      }
+      if (state.hasValue && !state.isLoading) {
+        debugPrint('Here');
+        context.goNamed(AppRoute.onboard.name);
+      }
+    });
+    final signUpController = ref.watch(signUpControllerProvider);
     return Scaffold(
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
@@ -32,6 +52,21 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
           child: Column(
             children: [
               Assets.svg.instructor.svg(),
+              TextFormField(
+                // key: _key,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  hintText: 'Name',
+                ),
+                validator: (value) {
+                  if (value == null) {
+                    return 'Name cannot be empty';
+                  }
+                  return null;
+                },
+                onSaved: (newValue) => setState(() => name = newValue),
+              ),
+              8.verticalSpace,
               TextFormField(
                 // key: _key,
                 keyboardType: TextInputType.emailAddress,
@@ -46,9 +81,7 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                 },
                 onSaved: (newValue) => setState(() => email = newValue),
               ),
-              const SizedBox(
-                height: 8,
-              ),
+              8.verticalSpace,
               TextFormField(
                 // key: _key,
                 obscureText: true,
@@ -66,21 +99,19 @@ class _LoginScreenState extends ConsumerState<SignUpScreen> {
                 },
                 onSaved: (newValue) => setState(() => password = newValue),
               ),
-              const SizedBox(
-                height: 40,
-              ),
+              40.verticalSpace,
               ElevatedButton(
-                onPressed: loginController.isLoading
+                onPressed: signUpController.isLoading
                     ? null
                     : () {
                         if (_key.currentState!.validate()) {
                           _key.currentState!.save();
                           ref
                               .read(signUpControllerProvider.notifier)
-                              .signup(email!, password!);
+                              .signup(name!, email!, password!);
                         }
                       },
-                child: loginController.isLoading
+                child: signUpController.isLoading
                     ? const Center(
                         child: CircularProgressIndicator(),
                       )
